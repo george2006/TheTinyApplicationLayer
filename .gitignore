@@ -1,0 +1,41 @@
+# Build output
+bin/
+obj/
+artifacts/
+
+# User and IDE state
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs and local runtime output
+*.log
+logs/
+
+# Test and coverage output
+TestResults/
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+
+# Docker/local data
+.env
+.env.*
+!*.env.example
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

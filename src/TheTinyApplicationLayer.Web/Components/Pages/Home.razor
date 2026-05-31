@@ -1,0 +1,289 @@
+@page "/"
+@rendermode InteractiveServer
+@using System.Net
+@using System.Net.Http.Json
+@using System.Text.Json
+@using TheTinyApplicationLayer.Web.Users
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager Navigation
+
+<PageTitle>Register User</PageTitle>
+
+<main class="sample-shell">
+    <section class="showcase-hero">
+        <div class="hero-copy">
+            <p class="eyebrow">Tiny suite sample</p>
+            <h1>The application layer, made visible.</h1>
+            <p>
+                A small ASP.NET Core workflow where validation, dispatching, durable events,
+                and background processing are all explicit enough to inspect.
+            </p>
+
+            <div class="hero-facts" aria-label="Sample guarantees">
+                <span>Real SQL Server</span>
+                <span>Durable outbox</span>
+                <span>Hosted worker</span>
+            </div>
+        </div>
+
+        <div class="flow-card" aria-label="Processing flow">
+            <div class="flow-card-header">
+                <span class="status-dot"></span>
+                <span>Live flow</span>
+            </div>
+            <div class="flow-lane">
+                <div>
+                    <span>01</span>
+                    <strong>Validate</strong>
+                    <small>TinyValidations</small>
+                </div>
+                <div>
+                    <span>02</span>
+                    <strong>Dispatch</strong>
+                    <small>TinyDispatcher</small>
+                </div>
+                <div>
+                    <span>03</span>
+                    <strong>Publish</strong>
+                    <small>TinyEvents</small>
+                </div>
+                <div>
+                    <span>04</span>
+                    <strong>Process</strong>
+                    <small>Worker</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="workspace-grid">
+        <section class="panel command-panel" aria-labelledby="register-user-title">
+            <div class="panel-header">
+                <div>
+                    <h2 id="register-user-title">Command</h2>
+                    <p>Create the user and durable event in one database boundary.</p>
+                </div>
+                <span class="status-pill">SQL Server outbox</span>
+            </div>
+
+            <EditForm Model="form" OnValidSubmit="SubmitAsync" FormName="register-user" class="command-form">
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <InputText id="email" class="text-input" @bind-Value="form.Email" autocomplete="email" />
+                    </div>
+
+                    <div class="field">
+                        <label for="displayName">Display name</label>
+                        <InputText id="displayName" class="text-input" @bind-Value="form.DisplayName" autocomplete="name" />
+                    </div>
+                </div>
+
+                <div class="actions-row">
+                    <button class="primary-action" type="submit" disabled="@isSubmitting">
+                        @(isSubmitting ? "Registering..." : "Register user")
+                    </button>
+                    <button class="secondary-action" type="button" @onclick="LoadLogsAsync">
+                        Refresh logs
+                    </button>
+                </div>
+            </EditForm>
+        </section>
+
+        <aside class="panel outcome-panel">
+            <div class="panel-header compact">
+                <h2>Outcome</h2>
+            </div>
+
+            @if (isSubmitting)
+            {
+                <div class="notice processing">
+                    <span class="notice-dot"></span>
+                    <div>
+                        <strong>Processing</strong>
+                        <p>Writing the user, publishing the event, then waiting for the worker.</p>
+                    </div>
+                </div>
+            }
+            else if (createdUserId is not null)
+            {
+                <div class="notice success">
+                    <span class="notice-dot"></span>
+                    <div>
+                        <strong>Registered</strong>
+                        <p>User id <code>@createdUserId</code></p>
+                    </div>
+                </div>
+            }
+            else if (validationErrors.Count > 0)
+            {
+                <div class="notice warning">
+                    <span class="notice-dot"></span>
+                    <div>
+                        <strong>Validation failed</strong>
+                        <ul>
+                            @foreach (var error in validationErrors)
+                            {
+                                <li>@error</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <span class="empty-icon">01</span>
+                    <strong>Ready for input</strong>
+                    <p>The result will appear here after the command finishes.</p>
+                </div>
+            }
+
+            <div class="metric-list">
+                <div>
+                    <span>Latest logs</span>
+                    <strong>@logs.Count</strong>
+                </div>
+                <div>
+                    <span>Worker</span>
+                    <strong>Active</strong>
+                </div>
+            </div>
+
+            <div class="outbox-note">
+                <span></span>
+                <p>Side effects are written by the event consumer, not by the request handler.</p>
+            </div>
+        </aside>
+    </section>
+
+    <section class="panel logs-panel">
+        <div class="panel-header">
+            <div>
+                <h2>WelcomeEmailLogs</h2>
+                <p>Most recent consumer side effects from the background worker.</p>
+            </div>
+        </div>
+
+        @if (logs.Count == 0)
+        {
+            <div class="table-empty">No welcome logs yet.</div>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Message</th>
+                            <th>Created UTC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in logs)
+                        {
+                            <tr>
+                                <td>@log.Email</td>
+                                <td>@log.Message</td>
+                                <td>@log.CreatedAtUtc.UtcDateTime.ToString("u")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</main>
+
+@code {
+    private readonly RegisterUserForm form = new();
+    private readonly List<string> validationErrors = new();
+    private List<WelcomeEmailLogResponse> logs = new();
+    private Guid? createdUserId;
+    private bool isSubmitting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadLogsAsync();
+    }
+
+    private async Task SubmitAsync()
+    {
+        isSubmitting = true;
+        createdUserId = null;
+        validationErrors.Clear();
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(Navigation.BaseUri);
+
+            var response = await client.PostAsJsonAsync(
+                "api/users/register",
+                new RegisterUserRequest(form.Email, form.DisplayName));
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                validationErrors.AddRange(await ReadValidationErrorsAsync(response));
+                return;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                validationErrors.Add($"The request failed with {(int)response.StatusCode} {response.ReasonPhrase}.");
+                return;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<RegisterUserResponse>();
+            createdUserId = result?.UserId;
+            await LoadLogsAsync();
+            await Task.Delay(2500);
+            await LoadLogsAsync();
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task LoadLogsAsync()
+    {
+        var client = HttpClientFactory.CreateClient();
+        client.BaseAddress = new Uri(Navigation.BaseUri);
+        logs = await client.GetFromJsonAsync<List<WelcomeEmailLogResponse>>("api/welcome-email-logs")
+            ?? new List<WelcomeEmailLogResponse>();
+    }
+
+    private static async Task<IReadOnlyList<string>> ReadValidationErrorsAsync(HttpResponseMessage response)
+    {
+        await using var stream = await response.Content.ReadAsStreamAsync();
+        using var document = await JsonDocument.ParseAsync(stream);
+
+        if (!document.RootElement.TryGetProperty("errors", out var errorsElement))
+        {
+            return new[] { "The command did not pass validation." };
+        }
+
+        var errors = new List<string>();
+
+        foreach (var property in errorsElement.EnumerateObject())
+        {
+            foreach (var error in property.Value.EnumerateArray())
+            {
+                errors.Add(error.GetString() ?? $"{property.Name} is invalid.");
+            }
+        }
+
+        return errors.Count == 0
+            ? new[] { "The command did not pass validation." }
+            : errors;
+    }
+
+    private sealed class RegisterUserForm
+    {
+        public string Email { get; set; } = string.Empty;
+
+        public string DisplayName { get; set; } = string.Empty;
+    }
+}
