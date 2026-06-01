@@ -44,10 +44,6 @@ public static class RegisterUserEndpoint
 
 }
 
-public sealed record RegisterUserRequest(string Email, string DisplayName);
-
-public sealed record RegisterUserResponse(Guid UserId);
-
 public static class TinyValidationProblemDetailsMiddleware
 {
     public static IApplicationBuilder UseTinyValidationProblemDetails(this IApplicationBuilder app)
