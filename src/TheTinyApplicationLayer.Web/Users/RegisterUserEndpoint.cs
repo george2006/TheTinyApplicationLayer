@@ -1,8 +1,8 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using TheTinyApplicationLayer.Application.DependencyInjection;
+using TheTinyApplicationLayer.Application.Users.GetWelcomeEmailLogs;
 using TheTinyApplicationLayer.Application.Users.RegisterUser;
-using TheTinyApplicationLayer.Infrastructure.Persistence;
 using TinyDispatcher.Dispatching;
 
 namespace TheTinyApplicationLayer.Web.Users;
@@ -41,18 +41,12 @@ public static class RegisterUserEndpoint
         });
 
         app.MapGet("/api/welcome-email-logs", async (
-            ApplicationDbContext dbContext,
+            IDispatcher<TinyDispatcher.AppContext> dispatcher,
             CancellationToken cancellationToken) =>
         {
-            var logs = await dbContext.WelcomeEmailLogs
-                .OrderByDescending(log => log.CreatedAtUtc)
-                .Take(10)
-                .Select(log => new WelcomeEmailLogResponse(
-                    log.UserId,
-                    log.Email,
-                    log.Message,
-                    log.CreatedAtUtc))
-                .ToListAsync(cancellationToken);
+            var logs = await dispatcher.DispatchAsync<GetWelcomeEmailLogs, IReadOnlyList<WelcomeEmailLog>>(
+                new GetWelcomeEmailLogs(10),
+                cancellationToken);
 
             return Results.Ok(logs);
         });
@@ -70,12 +64,6 @@ public static class RegisterUserEndpoint
 public sealed record RegisterUserRequest(string Email, string DisplayName);
 
 public sealed record RegisterUserResponse(Guid UserId);
-
-public sealed record WelcomeEmailLogResponse(
-    Guid UserId,
-    string Email,
-    string Message,
-    DateTimeOffset CreatedAtUtc);
 
 public static class TinyValidationProblemDetailsMiddleware
 {
