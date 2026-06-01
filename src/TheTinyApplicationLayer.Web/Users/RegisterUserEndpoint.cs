@@ -1,5 +1,3 @@
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using TheTinyApplicationLayer.Application.DependencyInjection;
 using TheTinyApplicationLayer.Application.Users.GetWelcomeEmailLogs;
 using TheTinyApplicationLayer.Application.Users.RegisterUser;
@@ -19,23 +17,13 @@ public static class RegisterUserEndpoint
             var userId = Guid.NewGuid();
             var registeredAtUtc = DateTimeOffset.UtcNow;
 
-            try
-            {
-                await dispatcher.DispatchAsync(
-                    new RegisterUser(
-                        userId,
-                        request.Email,
-                        request.DisplayName,
-                        registeredAtUtc),
-                    cancellationToken);
-            }
-            catch (DbUpdateException exception) when (IsUniqueEmailViolation(exception))
-            {
-                return Results.ValidationProblem(new Dictionary<string, string[]>
-                {
-                    ["Email"] = new[] { "A user with this email already exists." }
-                });
-            }
+            await dispatcher.DispatchAsync(
+                new RegisterUser(
+                    userId,
+                    request.Email,
+                    request.DisplayName,
+                    registeredAtUtc),
+                cancellationToken);
 
             return Results.Created($"/api/users/{userId}", new RegisterUserResponse(userId));
         });
@@ -54,11 +42,6 @@ public static class RegisterUserEndpoint
         return app;
     }
 
-    private static bool IsUniqueEmailViolation(DbUpdateException exception)
-    {
-        return exception.GetBaseException() is SqlException sqlException
-            && sqlException.Number is 2601 or 2627;
-    }
 }
 
 public sealed record RegisterUserRequest(string Email, string DisplayName);
