@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TheTinyApplicationLayer.Application.Users;
+using TheTinyApplicationLayer.Application.Domain;
 using TinyEvents.SqlServer.EntityFrameworkCore;
 
 namespace TheTinyApplicationLayer.Application.Persistence;
@@ -11,13 +11,13 @@ public sealed class ApplicationDbContext : DbContext
     {
     }
 
-    public DbSet<UserRow> Users => Set<UserRow>();
+    public DbSet<User> Users => Set<User>();
 
-    public DbSet<WelcomeEmailLogRow> WelcomeEmailLogs => Set<WelcomeEmailLogRow>();
+    public DbSet<WelcomeEmailLog> WelcomeEmailLogs => Set<WelcomeEmailLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<UserRow>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("Users");
             entity.HasKey(user => user.Id);
@@ -27,7 +27,7 @@ public sealed class ApplicationDbContext : DbContext
             entity.HasIndex(user => user.Email).IsUnique();
         });
 
-        modelBuilder.Entity<WelcomeEmailLogRow>(entity =>
+        modelBuilder.Entity<WelcomeEmailLog>(entity =>
         {
             entity.ToTable("WelcomeEmailLogs");
             entity.HasKey(log => log.Id);
@@ -39,4 +39,3 @@ public sealed class ApplicationDbContext : DbContext
         modelBuilder.UseTinyEventsOutbox();
     }
 }
-
