@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TheTinyApplicationLayer.Application.DependencyInjection;
 using TheTinyApplicationLayer.Application.Persistence;
-using TheTinyApplicationLayer.Application.Users;
 using TheTinyApplicationLayer.Application.Users.GetWelcomeEmailLogs;
 using TinyDispatcher.Dispatching;
+using WelcomeEmailLogEntity = TheTinyApplicationLayer.Application.Users.WelcomeEmailLog;
 
 namespace TheTinyApplicationLayer.Tests;
 
@@ -58,16 +58,13 @@ public sealed class GetWelcomeEmailLogsTests
         Assert.Equal("new@example.com", log.Email);
     }
 
-    private static WelcomeEmailLogRow CreateLog(string email, DateTimeOffset createdAtUtc)
+    private static WelcomeEmailLogEntity CreateLog(string email, DateTimeOffset createdAtUtc)
     {
-        return new WelcomeEmailLogRow
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Email = email,
-            Message = $"Welcome message queued for {email}.",
-            CreatedAtUtc = createdAtUtc
-        };
+        return WelcomeEmailLogEntity.Create(
+            Guid.NewGuid(),
+            email,
+            $"Welcome message queued for {email}.",
+            createdAtUtc);
     }
 
     private static async Task SeedAsync(

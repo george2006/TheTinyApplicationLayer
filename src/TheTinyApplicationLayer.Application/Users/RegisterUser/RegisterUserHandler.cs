@@ -24,23 +24,20 @@ public sealed class RegisterUserHandler
         TinyDispatcher.AppContext ctx,
         CancellationToken ct = default)
     {
-        var email = command.Email.Trim();
-        var displayName = command.DisplayName.Trim();
+        var user = User.Create(
+            command.UserId,
+            command.Email,
+            command.DisplayName,
+            command.RegisteredAtUtc);
 
-        dbContext.Users.Add(new UserRow
-        {
-            Id = command.UserId,
-            Email = email,
-            DisplayName = displayName,
-            RegisteredAtUtc = command.RegisteredAtUtc
-        });
+        dbContext.Users.Add(user);
 
         await events.PublishAsync(
             new UserRegistered(
-                command.UserId,
-                email,
-                displayName,
-                command.RegisteredAtUtc),
+                user.Id,
+                user.Email,
+                user.DisplayName,
+                user.RegisteredAtUtc),
             ct);
 
         await dbContext.SaveChangesAsync(ct);

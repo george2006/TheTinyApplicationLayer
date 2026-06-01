@@ -15,14 +15,11 @@ public sealed class EfCoreWelcomeEmailLogWriter : IWelcomeEmailLogWriter
 
     public void Add(Guid userId, string email, string message, DateTimeOffset createdAtUtc)
     {
-        dbContext.WelcomeEmailLogs.Add(new WelcomeEmailLogRow
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            Email = email,
-            Message = message,
-            CreatedAtUtc = createdAtUtc
-        });
+        dbContext.WelcomeEmailLogs.Add(WelcomeEmailLog.Create(
+            userId,
+            email,
+            message,
+            createdAtUtc));
     }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken = default)
