@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TheTinyApplicationLayer.Application.Persistence;
+using TheTinyApplicationLayer.Infrastructure.Persistence;
 using TinyDispatcher;
 
 namespace TheTinyApplicationLayer.Application.Users.GetWelcomeEmailLogs;

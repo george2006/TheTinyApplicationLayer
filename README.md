@@ -149,7 +149,7 @@ Start here:
 - `src/TheTinyApplicationLayer.Application/Users/RegisterUser/RegisterUserHandler.cs`
 - `src/TheTinyApplicationLayer.Application/Users/RegisterUser/UserRegistered.cs`
 - `src/TheTinyApplicationLayer.Application/Users/RegisterUser/CreateWelcomeEmailLog.cs`
-- `src/TheTinyApplicationLayer.Application/Persistence/ApplicationDbContext.cs`
+- `src/TheTinyApplicationLayer.Infrastructure/Persistence/ApplicationDbContext.cs`
 - `src/TheTinyApplicationLayer.Web/Program.cs`
 
 Read more in [TinySuite sample notes](docs/tiny-suite.md).

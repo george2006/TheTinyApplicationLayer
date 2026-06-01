@@ -1,12 +1,13 @@
 using TinyValidations;
+using TheTinyApplicationLayer.Infrastructure.Users;
 
 namespace TheTinyApplicationLayer.Application.Users.RegisterUser;
 
 public sealed class UniqueUserEmailRule : IAsyncValidationRule<RegisterUser>
 {
-    private readonly IUserEmailLookup users;
+    private readonly EfCoreUserEmailLookup users;
 
-    public UniqueUserEmailRule(IUserEmailLookup users)
+    public UniqueUserEmailRule(EfCoreUserEmailLookup users)
     {
         this.users = users;
     }

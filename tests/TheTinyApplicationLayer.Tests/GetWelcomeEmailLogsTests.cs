@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TheTinyApplicationLayer.Application.DependencyInjection;
-using TheTinyApplicationLayer.Application.Persistence;
 using TheTinyApplicationLayer.Application.Users.GetWelcomeEmailLogs;
+using TheTinyApplicationLayer.Infrastructure.Persistence;
 using TinyDispatcher.Dispatching;
-using WelcomeEmailLogEntity = TheTinyApplicationLayer.Application.Domain.WelcomeEmailLog;
+using WelcomeEmailLogEntity = TheTinyApplicationLayer.Domain.WelcomeEmailLog;
 using WelcomeEmailLogView = TheTinyApplicationLayer.Application.Users.GetWelcomeEmailLogs.WelcomeEmailLog;
 
 namespace TheTinyApplicationLayer.Tests;

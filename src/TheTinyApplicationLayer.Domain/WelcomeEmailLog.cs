@@ -1,4 +1,4 @@
-namespace TheTinyApplicationLayer.Application.Domain;
+namespace TheTinyApplicationLayer.Domain;
 
 public sealed class WelcomeEmailLog
 {

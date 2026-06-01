@@ -1,12 +1,13 @@
 using TinyEvents;
+using TheTinyApplicationLayer.Infrastructure.Users;
 
 namespace TheTinyApplicationLayer.Application.Users.RegisterUser;
 
 public sealed class CreateWelcomeEmailLog : IEventConsumer<UserRegistered>
 {
-    private readonly IWelcomeEmailLogWriter logs;
+    private readonly EfCoreWelcomeEmailLogWriter logs;
 
-    public CreateWelcomeEmailLog(IWelcomeEmailLogWriter logs)
+    public CreateWelcomeEmailLog(EfCoreWelcomeEmailLogWriter logs)
     {
         this.logs = logs;
     }

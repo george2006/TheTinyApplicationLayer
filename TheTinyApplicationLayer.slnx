@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/TheTinyApplicationLayer.Application/TheTinyApplicationLayer.Application.csproj" />
+    <Project Path="src/TheTinyApplicationLayer.Domain/TheTinyApplicationLayer.Domain.csproj" />
     <Project Path="src/TheTinyApplicationLayer.Infrastructure/TheTinyApplicationLayer.Infrastructure.csproj" />
     <Project Path="src/TheTinyApplicationLayer.Web/TheTinyApplicationLayer.Web.csproj" />
   </Folder>

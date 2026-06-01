@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TheTinyApplicationLayer.Application.Persistence;
-using TheTinyApplicationLayer.Application.Users.RegisterUser;
+using TheTinyApplicationLayer.Infrastructure.Persistence;
 
 namespace TheTinyApplicationLayer.Infrastructure.Users;
 
-public sealed class EfCoreUserEmailLookup : IUserEmailLookup
+public sealed class EfCoreUserEmailLookup
 {
     private readonly ApplicationDbContext dbContext;
 
