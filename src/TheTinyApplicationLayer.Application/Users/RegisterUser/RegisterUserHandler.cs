@@ -1,5 +1,5 @@
+using TheTinyApplicationLayer.Application.Domain;
 using TheTinyApplicationLayer.Application.Persistence;
-using TheTinyApplicationLayer.Application.Users;
 using TinyDispatcher;
 using TinyEvents;
 

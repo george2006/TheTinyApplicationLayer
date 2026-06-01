@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TheTinyApplicationLayer.Application.Users;
+using TheTinyApplicationLayer.Application.Domain;
 using TinyEvents.SqlServer.EntityFrameworkCore;
 
 namespace TheTinyApplicationLayer.Application.Persistence;

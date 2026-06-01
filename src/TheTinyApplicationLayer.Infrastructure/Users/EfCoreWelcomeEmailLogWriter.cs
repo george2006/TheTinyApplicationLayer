@@ -1,5 +1,5 @@
+using TheTinyApplicationLayer.Application.Domain;
 using TheTinyApplicationLayer.Application.Persistence;
-using TheTinyApplicationLayer.Application.Users;
 using TheTinyApplicationLayer.Application.Users.RegisterUser;
 
 namespace TheTinyApplicationLayer.Infrastructure.Users;

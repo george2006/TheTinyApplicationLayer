@@ -4,7 +4,8 @@ using TheTinyApplicationLayer.Application.DependencyInjection;
 using TheTinyApplicationLayer.Application.Persistence;
 using TheTinyApplicationLayer.Application.Users.GetWelcomeEmailLogs;
 using TinyDispatcher.Dispatching;
-using WelcomeEmailLogEntity = TheTinyApplicationLayer.Application.Users.WelcomeEmailLog;
+using WelcomeEmailLogEntity = TheTinyApplicationLayer.Application.Domain.WelcomeEmailLog;
+using WelcomeEmailLogView = TheTinyApplicationLayer.Application.Users.GetWelcomeEmailLogs.WelcomeEmailLog;
 
 namespace TheTinyApplicationLayer.Tests;
 
@@ -27,7 +28,7 @@ public sealed class GetWelcomeEmailLogsTests
 
         var dispatcher = provider.GetRequiredService<IDispatcher<TinyDispatcher.AppContext>>();
 
-        var logs = await dispatcher.DispatchAsync<GetWelcomeEmailLogs, IReadOnlyList<WelcomeEmailLog>>(
+        var logs = await dispatcher.DispatchAsync<GetWelcomeEmailLogs, IReadOnlyList<WelcomeEmailLogView>>(
             new GetWelcomeEmailLogs(10),
             CancellationToken.None);
 
