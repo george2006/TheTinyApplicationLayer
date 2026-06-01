@@ -16,6 +16,8 @@ Blazor Form
 
 This is not a framework or a production template. It is a readable sample of an explicit application layer.
 
+Read more in [TinySuite sample notes](docs/tiny-suite.md).
+
 ## Why Docker Compose is required
 
 This sample intentionally uses SQL Server through Docker Compose. TinyEvents is an outbox-first library, so the interesting behavior only appears when events are stored durably and later processed by a worker. Running against a real database allows the sample to demonstrate transaction boundaries, outbox storage, worker claiming, and event processing.
