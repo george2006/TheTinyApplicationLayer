@@ -1,4 +1,4 @@
-namespace TheTinyApplicationLayer.Infrastructure.Users;
+namespace TheTinyApplicationLayer.Application.Users;
 
 public sealed class UserRow
 {
@@ -10,3 +10,4 @@ public sealed class UserRow
 
     public DateTimeOffset RegisteredAtUtc { get; set; }
 }
+

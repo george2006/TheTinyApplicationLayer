@@ -1,19 +1,21 @@
-using TheTinyApplicationLayer.Domain.Users;
+using TheTinyApplicationLayer.Application.Persistence;
+using TheTinyApplicationLayer.Application.Users;
 using TinyDispatcher;
 using TinyEvents;
 
 namespace TheTinyApplicationLayer.Application.Users.RegisterUser;
 
-public sealed class RegisterUserHandler : ICommandHandler<RegisterUser, TinyDispatcher.AppContext>
+public sealed class RegisterUserHandler
+    : ICommandHandler<RegisterUser, TinyDispatcher.AppContext>
 {
-    private readonly IUserRegistrationStore users;
+    private readonly ApplicationDbContext dbContext;
     private readonly ITinyEventPublisher events;
 
     public RegisterUserHandler(
-        IUserRegistrationStore users,
+        ApplicationDbContext dbContext,
         ITinyEventPublisher events)
     {
-        this.users = users;
+        this.dbContext = dbContext;
         this.events = events;
     }
 
@@ -22,22 +24,25 @@ public sealed class RegisterUserHandler : ICommandHandler<RegisterUser, TinyDisp
         TinyDispatcher.AppContext ctx,
         CancellationToken ct = default)
     {
-        users.Add(new User
+        var email = command.Email.Trim();
+        var displayName = command.DisplayName.Trim();
+
+        dbContext.Users.Add(new UserRow
         {
             Id = command.UserId,
-            Email = command.Email.Trim(),
-            DisplayName = command.DisplayName.Trim(),
+            Email = email,
+            DisplayName = displayName,
             RegisteredAtUtc = command.RegisteredAtUtc
         });
 
         await events.PublishAsync(
             new UserRegistered(
                 command.UserId,
-                command.Email.Trim(),
-                command.DisplayName.Trim(),
+                email,
+                displayName,
                 command.RegisteredAtUtc),
             ct);
 
-        await users.SaveChangesAsync(ct);
+        await dbContext.SaveChangesAsync(ct);
     }
 }

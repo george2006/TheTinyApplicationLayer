@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TheTinyApplicationLayer.Infrastructure.Users;
+using TheTinyApplicationLayer.Application.Users;
 using TinyEvents.SqlServer.EntityFrameworkCore;
 
-namespace TheTinyApplicationLayer.Infrastructure.Persistence;
+namespace TheTinyApplicationLayer.Application.Persistence;
 
 public sealed class ApplicationDbContext : DbContext
 {
@@ -39,3 +39,4 @@ public sealed class ApplicationDbContext : DbContext
         modelBuilder.UseTinyEventsOutbox();
     }
 }
+

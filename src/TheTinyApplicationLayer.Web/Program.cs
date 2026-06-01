@@ -1,6 +1,6 @@
+using TheTinyApplicationLayer.Application.Persistence;
 using TheTinyApplicationLayer.Application.DependencyInjection;
 using TheTinyApplicationLayer.Infrastructure.DependencyInjection;
-using TheTinyApplicationLayer.Infrastructure.Persistence;
 using TheTinyApplicationLayer.Web.Components;
 using TheTinyApplicationLayer.Web.Users;
 using TinyEvents.Worker;
