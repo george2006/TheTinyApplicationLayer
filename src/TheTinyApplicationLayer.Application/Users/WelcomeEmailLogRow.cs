@@ -1,4 +1,4 @@
-namespace TheTinyApplicationLayer.Infrastructure.Users;
+namespace TheTinyApplicationLayer.Application.Users;
 
 public sealed class WelcomeEmailLogRow
 {
@@ -12,3 +12,4 @@ public sealed class WelcomeEmailLogRow
 
     public string Message { get; set; } = string.Empty;
 }
+

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using TheTinyApplicationLayer.Application.Persistence;
 using TheTinyApplicationLayer.Application.Users.RegisterUser;
-using TheTinyApplicationLayer.Infrastructure.Persistence;
 
 namespace TheTinyApplicationLayer.Infrastructure.Users;
 

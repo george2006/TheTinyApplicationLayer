@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TheTinyApplicationLayer.Application.Persistence;
 using TheTinyApplicationLayer.Application.Users.RegisterUser;
-using TheTinyApplicationLayer.Infrastructure.Persistence;
 using TheTinyApplicationLayer.Infrastructure.Users;
 using TinyEvents.SqlServer.EntityFrameworkCore;
 
@@ -23,7 +23,6 @@ public static class InfrastructureServiceCollectionExtensions
         });
 
         services.UseSqlServerEntityFrameworkCoreOutbox<ApplicationDbContext>();
-        services.AddScoped<IUserRegistrationStore, EfCoreUserRegistrationStore>();
         services.AddScoped<IUserEmailLookup, EfCoreUserEmailLookup>();
         services.AddScoped<IWelcomeEmailLogWriter, EfCoreWelcomeEmailLogWriter>();
 
