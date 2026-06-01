@@ -1,34 +1,118 @@
 # TheTinyApplicationLayer
 
-A small ASP.NET Core + Blazor sample showing the Tiny suite working together:
+TheTinyApplicationLayer is a small ASP.NET Core + Blazor sample that shows how the Tiny suite fits together in a real application layer.
+
+It is intentionally tiny: one user registration flow, one validation step, one command handler, one durable event, one worker, and one consumer side effect.
+
+The goal is not to provide a production template. The goal is to make the boundaries easy to see.
+
+## Why This Sample Exists
+
+The Tiny packages are small on purpose. Each one solves a narrow application-layer problem:
+
+- TinyValidations answers: "Is this command valid before the use case runs?"
+- TinyDispatcher answers: "How do I send this command or query to the right handler?"
+- TinyEvents answers: "How do I publish an event without losing it if the process dies?"
+- TinyEvents.Worker answers: "How do pending outbox events get processed later?"
+
+This sample puts those pieces together in one ordinary ASP.NET Core app so you can see the full path from UI input to durable side effect.
+
+## The Story
+
+The sample implements a single workflow: registering a user.
 
 ```text
-Blazor Form
--> API Endpoint
--> TinyValidations
+Blazor form
+-> Minimal API endpoint
 -> TinyDispatcher
--> Use Case
--> TinyEvents Outbox
--> Worker
--> Event Consumer
--> WelcomeEmailLog
+-> TinyValidations middleware
+-> RegisterUserHandler
+-> EF Core saves the user
+-> TinyEvents writes UserRegistered to the outbox
+-> TinyEvents.Worker reads the outbox
+-> CreateWelcomeEmailLog consumer runs
+-> WelcomeEmailLogs records the side effect
 ```
 
-This is not a framework or a production template. It is a readable sample of an explicit application layer.
+The important idea is that the user and the event are saved durably before the asynchronous side effect runs. That makes the event processing visible, repeatable, and resilient.
 
-Read more in [TinySuite sample notes](docs/tiny-suite.md).
+## What Uses What
 
-## Why Docker Compose is required
+### Web project
 
-This sample intentionally uses SQL Server through Docker Compose. TinyEvents is an outbox-first library, so the interesting behavior only appears when events are stored durably and later processed by a worker. Running against a real database allows the sample to demonstrate transaction boundaries, outbox storage, worker claiming, and event processing.
+`TheTinyApplicationLayer.Web` owns the HTTP and UI surface.
 
-`dotnet run` is not enough. Start SQL Server first:
+It contains:
+
+- the Blazor form
+- the Minimal API endpoints
+- app startup
+- TinyEvents worker registration
+- validation problem-details middleware
+
+It references:
+
+- `TinyDispatcher`
+- `TinyValidations`
+- `TinyEvents.Worker`
+- the Application project
+- the Infrastructure project
+
+### Application project
+
+`TheTinyApplicationLayer.Application` owns the application layer.
+
+It contains:
+
+- commands and queries
+- handlers
+- validation rules
+- domain entities used by the sample
+- event definitions
+- event consumers
+- the EF Core application DbContext
+
+It references:
+
+- `TinyDispatcher`
+- `TinyValidations`
+- `TinyEvents`
+- `TinyEvents.SqlServer.EntityFrameworkCore`
+
+### Infrastructure project
+
+`TheTinyApplicationLayer.Infrastructure` owns concrete persistence services.
+
+It contains:
+
+- SQL Server DbContext registration
+- EF Core implementations for application interfaces
+
+It references:
+
+- `Microsoft.EntityFrameworkCore.SqlServer`
+- `TinyEvents.SqlServer.EntityFrameworkCore`
+- the Application project
+
+## Why Docker Compose Is Required
+
+This sample uses SQL Server through Docker Compose because TinyEvents is an outbox-first library.
+
+The interesting behavior only appears when events are stored durably and processed later by a worker. A real database lets the sample demonstrate:
+
+- transaction boundaries
+- outbox persistence
+- worker claiming
+- event processing
+- consumer side effects
+
+`dotnet run` alone is not enough. Start SQL Server first:
 
 ```bash
 docker compose up -d
 ```
 
-## Run the app
+## Run The App
 
 The local connection string is in `src/TheTinyApplicationLayer.Web/appsettings.json` and points at SQL Server on port `14333`.
 
@@ -39,33 +123,38 @@ dotnet run --project src/TheTinyApplicationLayer.Web
 
 In development, the sample uses `EnsureCreatedAsync` to create the schema. Production applications should use migrations. The EF Core model includes `Users`, `WelcomeEmailLogs`, and the TinyEvents outbox table through `modelBuilder.UseTinyEventsOutbox()`.
 
-Open the app, submit the Register User form, then inspect the database.
+## What To Try
 
-## What to inspect in the database
+Open the app and submit the Register User form.
 
-After form submit:
+Before the worker processes the event:
 
 - `Users` contains the registered user.
 - `TinyOutbox` contains the serialized `UserRegistered` event.
 
-After the worker runs:
+After the worker processes the event:
 
 - `WelcomeEmailLogs` contains the consumer side effect.
 - The TinyEvents outbox row is marked processed according to TinyEvents behavior.
 
-For this sample, the TinyEvents worker runs in the same ASP.NET host. In production, it could run in a separate worker process using the same database.
+For this sample, the TinyEvents worker runs in the same ASP.NET Core host. In production, it could run in a separate worker process using the same database.
 
-## Where the Tiny packages appear
+## Good Places To Read First
 
-- TinyValidations validates `RegisterUser`.
-- TinyDispatcher dispatches `RegisterUser` to `RegisterUserHandler`.
-- TinyEvents publishes `UserRegistered` into the outbox.
-- TinyEvents.SqlServer.EntityFrameworkCore stores the outbox row with EF Core.
-- TinyEvents.Worker claims and processes pending outbox rows.
+Start here:
 
-Status: this sample uses TinyEvents alpha packages. APIs may change before TinyEvents 1.0.
+- `src/TheTinyApplicationLayer.Web/Users/RegisterUserEndpoint.cs`
+- `src/TheTinyApplicationLayer.Application/Users/RegisterUser/RegisterUser.cs`
+- `src/TheTinyApplicationLayer.Application/Users/RegisterUser/RegisterUserValidation.cs`
+- `src/TheTinyApplicationLayer.Application/Users/RegisterUser/RegisterUserHandler.cs`
+- `src/TheTinyApplicationLayer.Application/Users/RegisterUser/UserRegistered.cs`
+- `src/TheTinyApplicationLayer.Application/Users/RegisterUser/CreateWelcomeEmailLog.cs`
+- `src/TheTinyApplicationLayer.Application/Persistence/ApplicationDbContext.cs`
+- `src/TheTinyApplicationLayer.Web/Program.cs`
 
-## Package versions
+Read more in [TinySuite sample notes](docs/tiny-suite.md).
+
+## Package Versions
 
 Verified against nuget.org on May 31, 2026:
 
@@ -74,3 +163,5 @@ Verified against nuget.org on May 31, 2026:
 - `TinyEvents` `0.1.0-alpha.1`
 - `TinyEvents.SqlServer.EntityFrameworkCore` `0.1.0-alpha.1`
 - `TinyEvents.Worker` `0.1.0-alpha.1`
+
+TinyEvents is still alpha, so APIs may change before 1.0.
