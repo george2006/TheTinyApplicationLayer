@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TheTinyApplicationLayer.Application.Domain;
+using TheTinyApplicationLayer.Domain;
 using TinyEvents.SqlServer.EntityFrameworkCore;
 
-namespace TheTinyApplicationLayer.Application.Persistence;
+namespace TheTinyApplicationLayer.Infrastructure.Persistence;
 
 public sealed class ApplicationDbContext : DbContext
 {

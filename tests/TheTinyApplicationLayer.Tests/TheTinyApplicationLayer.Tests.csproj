@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TheTinyApplicationLayer.Application\TheTinyApplicationLayer.Application.csproj" />
+    <ProjectReference Include="..\..\src\TheTinyApplicationLayer.Domain\TheTinyApplicationLayer.Domain.csproj" />
     <ProjectReference Include="..\..\src\TheTinyApplicationLayer.Infrastructure\TheTinyApplicationLayer.Infrastructure.csproj" />
   </ItemGroup>
 

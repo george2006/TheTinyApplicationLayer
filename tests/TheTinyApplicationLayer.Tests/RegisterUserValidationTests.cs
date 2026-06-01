@@ -1,5 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TheTinyApplicationLayer.Application.Users.RegisterUser;
+using TheTinyApplicationLayer.Domain;
+using TheTinyApplicationLayer.Infrastructure.Persistence;
+using TheTinyApplicationLayer.Infrastructure.Users;
 using TinyValidations;
 
 namespace TheTinyApplicationLayer.Tests;
@@ -9,10 +13,7 @@ public sealed class RegisterUserValidationTests
     [Fact]
     public async Task Rejects_invalid_email()
     {
-        var services = new ServiceCollection();
-        services.AddSingleton<IUserEmailLookup>(new StubUserEmailLookup(false));
-        services.UseTinyValidations();
-        using var provider = services.BuildServiceProvider();
+        using var provider = BuildProvider();
 
         var validator = provider.GetRequiredService<ITinyValidator>();
         var result = await validator.ValidateAsync(new RegisterUser(
@@ -27,10 +28,8 @@ public sealed class RegisterUserValidationTests
     [Fact]
     public async Task Rejects_duplicate_email()
     {
-        var services = new ServiceCollection();
-        services.AddSingleton<IUserEmailLookup>(new StubUserEmailLookup(true));
-        services.UseTinyValidations();
-        using var provider = services.BuildServiceProvider();
+        using var provider = BuildProvider();
+        await SeedUserAsync(provider, "ada@example.com");
 
         var validator = provider.GetRequiredService<ITinyValidator>();
         var result = await validator.ValidateAsync(new RegisterUser(
@@ -44,20 +43,32 @@ public sealed class RegisterUserValidationTests
             && error.Message == "A user with this email already exists.");
     }
 
-    private sealed class StubUserEmailLookup : IUserEmailLookup
+    private static ServiceProvider BuildProvider()
     {
-        private readonly bool exists;
-
-        public StubUserEmailLookup(bool exists)
+        var services = new ServiceCollection();
+        services.AddDbContext<ApplicationDbContext>(options =>
         {
-            this.exists = exists;
-        }
+            options.UseInMemoryDatabase(Guid.NewGuid().ToString());
+        });
+        services.AddScoped<EfCoreUserEmailLookup>();
+        services.UseTinyValidations();
 
-        public ValueTask<bool> ExistsAsync(
-            string email,
-            CancellationToken cancellationToken = default)
-        {
-            return ValueTask.FromResult(exists);
-        }
+        return services.BuildServiceProvider();
+    }
+
+    private static async Task SeedUserAsync(
+        ServiceProvider provider,
+        string email)
+    {
+        await using var scope = provider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        dbContext.Users.Add(User.Create(
+            Guid.NewGuid(),
+            email,
+            "Ada",
+            DateTimeOffset.UtcNow));
+
+        await dbContext.SaveChangesAsync();
     }
 }

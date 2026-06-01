@@ -1,10 +1,9 @@
-using TheTinyApplicationLayer.Application.Domain;
-using TheTinyApplicationLayer.Application.Persistence;
-using TheTinyApplicationLayer.Application.Users.RegisterUser;
+using TheTinyApplicationLayer.Domain;
+using TheTinyApplicationLayer.Infrastructure.Persistence;
 
 namespace TheTinyApplicationLayer.Infrastructure.Users;
 
-public sealed class EfCoreWelcomeEmailLogWriter : IWelcomeEmailLogWriter
+public sealed class EfCoreWelcomeEmailLogWriter
 {
     private readonly ApplicationDbContext dbContext;
 

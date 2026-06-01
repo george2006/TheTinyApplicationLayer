@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TheTinyApplicationLayer.Application\TheTinyApplicationLayer.Application.csproj" />
+    <ProjectReference Include="..\TheTinyApplicationLayer.Domain\TheTinyApplicationLayer.Domain.csproj" />
   </ItemGroup>
 
 </Project>
