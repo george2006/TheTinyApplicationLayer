@@ -45,10 +45,11 @@ public sealed class RegisterUserValidationTests
 
     private static ServiceProvider BuildProvider()
     {
+        var databaseName = Guid.NewGuid().ToString();
         var services = new ServiceCollection();
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseInMemoryDatabase(Guid.NewGuid().ToString());
+            options.UseInMemoryDatabase(databaseName);
         });
         services.AddScoped<EfCoreUserEmailLookup>();
         services.UseTinyValidations();
