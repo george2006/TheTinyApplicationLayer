@@ -165,3 +165,10 @@ Verified against nuget.org on May 31, 2026:
 - `TinyEvents.Worker` `0.1.0-alpha.1`
 
 TinyEvents is still alpha, so APIs may change before 1.0.
+
+## Tiny Suite Repositories
+
+- [TinyDispatcher](https://github.com/george2006/TinyDispatcher) — command and query dispatching for explicit use-case execution.
+- [TinyValidations](https://github.com/george2006/TinyValidations) — small source-generated validation for application commands.
+- [TinyEvents](https://github.com/george2006/TinyEvents) — durable domain and application events with outbox-first publishing.
+- [TheTinyApplicationLayer](https://github.com/george2006/TheTinyApplicationLayer) — this end-to-end sample showing the suite working together.
