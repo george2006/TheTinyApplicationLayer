@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TinyDispatcher" Version="1.2.0-alpha.1" />
-    <PackageReference Include="TinyEvents.Worker" Version="0.1.0-alpha.1" />
+    <PackageReference Include="TinyDispatcher" Version="1.2.0" />
+    <PackageReference Include="TinyEvents.Worker" Version="0.1.0-alpha.2" />
   </ItemGroup>
 
   <ItemGroup>
