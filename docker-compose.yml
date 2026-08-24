@@ -7,8 +7,76 @@ services:
       MSSQL_SA_PASSWORD: "TinyApplication_2026!"
     ports:
       - "14333:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TinyApplication_2026!' -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
     volumes:
       - sqlserver-data:/var/opt/mssql
 
+  tinyobservability-database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    command:
+      - /opt/mssql-tools18/bin/sqlcmd
+      - -S
+      - sqlserver
+      - -U
+      - sa
+      - -P
+      - TinyApplication_2026!
+      - -C
+      - -b
+      - -Q
+      - "IF DB_ID('TinyObservability') IS NULL CREATE DATABASE [TinyObservability]"
+
+  tinyobservability-server:
+    image: mcr.microsoft.com/dotnet/aspnet:10.0
+    depends_on:
+      tinyobservability-database:
+        condition: service_completed_successfully
+    environment:
+      ConnectionStrings__TinyObservability: "Server=sqlserver,1433;Database=TinyObservability;User Id=sa;Password=TinyApplication_2026!;Encrypt=False;TrustServerCertificate=True;"
+    working_dir: /app
+    command: ["dotnet", "/app/TinyObservability.Server.dll"]
+    ports:
+      - "4317:4317"
+      - "5080:5080"
+    volumes:
+      - ../TinyObservability/artifacts/server-publish:/app:ro
+
+  web:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      tinyobservability-server:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      Application__BaseAddress: http://localhost:8080
+      ConnectionStrings__ApplicationDb: "Server=sqlserver,1433;Database=TheTinyApplicationLayer;User Id=sa;Password=TinyApplication_2026!;Encrypt=False;TrustServerCertificate=True;"
+      TinyObservability__ApplicationMapAddress: http://tinyobservability-server:4317
+    working_dir: /workspace/TheTinyApplicationLayer
+    command:
+      - sh
+      - -c
+      - >-
+        dotnet restore src/TheTinyApplicationLayer.Web --configfile NuGet.local.config
+        --property:ArtifactsPath=/tmp/the-tiny-artifacts &&
+        dotnet run --project src/TheTinyApplicationLayer.Web --configuration Release --no-restore
+        --no-launch-profile --property:ArtifactsPath=/tmp/the-tiny-artifacts
+    ports:
+      - "5041:8080"
+    volumes:
+      - .:/workspace/TheTinyApplicationLayer
+      - ../TinyObservability/artifacts:/workspace/TinyObservability/artifacts:ro
+      - dotnet-packages:/root/.nuget/packages
+
 volumes:
   sqlserver-data:
+  dotnet-packages:

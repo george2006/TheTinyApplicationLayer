@@ -6,7 +6,6 @@
 @using TheTinyApplicationLayer.Application.Users.GetWelcomeEmailLogs
 @using TheTinyApplicationLayer.Web.Users
 @inject IHttpClientFactory HttpClientFactory
-@inject NavigationManager Navigation
 
 <PageTitle>Register User</PageTitle>
 
@@ -217,8 +216,7 @@
 
         try
         {
-            var client = HttpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(Navigation.BaseUri);
+            var client = HttpClientFactory.CreateClient("Application");
 
             var response = await client.PostAsJsonAsync(
                 "api/users/register",
@@ -250,8 +248,7 @@
 
     private async Task LoadLogsAsync()
     {
-        var client = HttpClientFactory.CreateClient();
-        client.BaseAddress = new Uri(Navigation.BaseUri);
+        var client = HttpClientFactory.CreateClient("Application");
         logs = await client.GetFromJsonAsync<List<WelcomeEmailLog>>("api/welcome-email-logs")
             ?? new List<WelcomeEmailLog>();
     }
