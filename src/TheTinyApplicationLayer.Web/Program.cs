@@ -4,6 +4,9 @@ using TheTinyApplicationLayer.Infrastructure.Persistence;
 using TheTinyApplicationLayer.Web.Components;
 using TheTinyApplicationLayer.Web.Users;
 using TinyEvents.Worker;
+using TinyObservability.ApplicationMap;
+using TinyObservability.ApplicationMap.TinyDispatcher;
+using TinyObservability.ApplicationMap.TinyValidations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +16,19 @@ builder.Logging.AddDebug();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("Application", client =>
+{
+    client.BaseAddress = new Uri(
+        builder.Configuration["Application:BaseAddress"] ?? "http://localhost:5041");
+});
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddTinyApplicationMap(
+    "TheTinyApplicationLayer",
+    new Uri(builder.Configuration["TinyObservability:ApplicationMapAddress"] ?? "http://localhost:4317"),
+    map => map
+        .AddTinyDispatcher()
+        .AddTinyValidations());
 builder.Services.AddTinyEventsWorker(options =>
 {
     options.BatchSize = 10;

@@ -6,6 +6,8 @@ It is intentionally tiny: one user registration flow, one validation step, one c
 
 The goal is not to provide a production template. The goal is to make the boundaries easy to see.
 
+![TheTinyApplicationLayer sample](docs/images/application.png)
+
 ## Why This Sample Exists
 
 The Tiny packages are small on purpose. Each one solves a narrow application-layer problem:
@@ -35,6 +37,16 @@ Blazor form
 ```
 
 The important idea is that the user and the event are saved durably before the asynchronous side effect runs. That makes the event processing visible, repeatable, and resilient.
+
+## See The Application Structure
+
+The cold map is collected from the application structure without executing a command. It shows the operations, validations, generated pipeline metadata, and handlers that compose the sample.
+
+![TheTinyApplicationLayer cold application map](docs/images/application-map.png)
+
+Select an operation to inspect its business rules and execution steps without coupling the dashboard to TinyDispatcher or TinyValidations.
+
+![RegisterUser application map](docs/images/register-user-map.png)
 
 ## What Uses What
 
@@ -94,9 +106,41 @@ It references:
 - `TinyEvents.SqlServer.EntityFrameworkCore`
 - the Application project
 
+## Run The Complete Demo
+
+The complete showcase starts with one command:
+
+```bash
+docker compose up -d
+```
+
+Docker Compose starts:
+
+- SQL Server on `localhost:14333`
+- TheTinyApplicationLayer on [http://localhost:5041](http://localhost:5041)
+- TinyObservability on [http://localhost:5080](http://localhost:5080)
+- the application-map gRPC endpoint on `localhost:4317`
+
+Open the [cold application map](http://localhost:5080/map?service=TheTinyApplicationLayer) directly, or use the **Application map** link in the sample header.
+
+Stop the complete demo with:
+
+```bash
+docker compose down
+```
+
+### Local Observability Prerequisites
+
+The Observability packages are not public yet. This temporary showcase expects the repositories to be sibling directories and consumes:
+
+- the already packaged ApplicationMap adapters from `../TinyObservability/artifacts/tiny-local-feed`
+- the already published Server files from `../TinyObservability/artifacts/server-publish`
+
+`TinyDispatcher` and `TinyValidations` still come from NuGet using their real public versions. Docker Compose does not build or package any Tiny library.
+
 ## Why Docker Compose Is Required
 
-This sample uses SQL Server through Docker Compose because TinyEvents is an outbox-first library.
+This sample uses SQL Server because TinyEvents is an outbox-first library.
 
 The interesting behavior only appears when events are stored durably and processed later by a worker. A real database lets the sample demonstrate:
 
@@ -105,21 +149,6 @@ The interesting behavior only appears when events are stored durably and process
 - worker claiming
 - event processing
 - consumer side effects
-
-`dotnet run` alone is not enough. Start SQL Server first:
-
-```bash
-docker compose up -d
-```
-
-## Run The App
-
-The local connection string is in `src/TheTinyApplicationLayer.Web/appsettings.json` and points at SQL Server on port `14333`.
-
-```bash
-dotnet restore
-dotnet run --project src/TheTinyApplicationLayer.Web
-```
 
 In development, the sample uses `EnsureCreatedAsync` to create the schema. Production applications should use migrations. The EF Core model includes `Users`, `WelcomeEmailLogs`, and the TinyEvents outbox table through `modelBuilder.UseTinyEventsOutbox()`.
 
