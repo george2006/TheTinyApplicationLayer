@@ -10,6 +10,8 @@
   <ItemGroup>
     <PackageReference Include="TinyDispatcher" Version="1.3.0-beta.3" />
     <PackageReference Include="TinyEvents.Worker" Version="0.1.0-alpha.2" />
+    <PackageReference Include="TinyObservability.ApplicationMap.TinyDispatcher" Version="0.1.0-alpha.1-local.1" />
+    <PackageReference Include="TinyObservability.ApplicationMap.TinyValidations" Version="0.1.0-alpha.1-local.1" />
   </ItemGroup>
 
   <ItemGroup>

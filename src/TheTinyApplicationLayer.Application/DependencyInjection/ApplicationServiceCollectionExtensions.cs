@@ -3,6 +3,10 @@ using TinyDispatcher;
 using TinyDispatcher.Pipeline;
 using TinyValidations;
 
+[assembly: TinyDispatcherGeneratorOptions(
+    EmitPipelineMap = true,
+    PipelineMapFormat = "attributes")]
+
 namespace TheTinyApplicationLayer.Application.DependencyInjection;
 
 public static class ApplicationServiceCollectionExtensions
