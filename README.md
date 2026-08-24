@@ -156,10 +156,10 @@ Read more in [TinySuite sample notes](docs/tiny-suite.md).
 
 ## Package Versions
 
-Verified against nuget.org on June 20, 2026:
+Verified against nuget.org on August 24, 2026:
 
-- `TinyValidations` `1.0.0`
-- `TinyDispatcher` `1.2.0`
+- `TinyValidations` `1.1.0-beta.2`
+- `TinyDispatcher` `1.3.0-beta.3`
 - `TinyEvents` `0.1.0-alpha.2`
 - `TinyEvents.SqlServer.EntityFrameworkCore` `0.1.0-alpha.2`
 - `TinyEvents.Worker` `0.1.0-alpha.2`
