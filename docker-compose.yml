@@ -34,19 +34,15 @@ services:
       - "IF DB_ID('TinyObservability') IS NULL CREATE DATABASE [TinyObservability]"
 
   tinyobservability-server:
-    image: mcr.microsoft.com/dotnet/aspnet:10.0
+    image: ghcr.io/george2006/tinyobservability-server:0.1.0-alpha.1
     depends_on:
       tinyobservability-database:
         condition: service_completed_successfully
     environment:
       ConnectionStrings__TinyObservability: "Server=sqlserver,1433;Database=TinyObservability;User Id=sa;Password=TinyApplication_2026!;Encrypt=False;TrustServerCertificate=True;"
-    working_dir: /app
-    command: ["dotnet", "/app/TinyObservability.Server.dll"]
     ports:
       - "4317:4317"
       - "5080:5080"
-    volumes:
-      - ../TinyObservability/artifacts/server-publish:/app:ro
 
   web:
     image: mcr.microsoft.com/dotnet/sdk:10.0
@@ -74,7 +70,6 @@ services:
       - "5041:8080"
     volumes:
       - .:/workspace/TheTinyApplicationLayer
-      - ../TinyObservability/artifacts:/workspace/TinyObservability/artifacts:ro
       - dotnet-packages:/root/.nuget/packages
 
 volumes:

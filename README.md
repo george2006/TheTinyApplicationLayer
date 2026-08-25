@@ -118,7 +118,7 @@ Docker Compose starts:
 
 - SQL Server on `localhost:14333`
 - TheTinyApplicationLayer on [http://localhost:5041](http://localhost:5041)
-- TinyObservability on [http://localhost:5080](http://localhost:5080)
+- TinyObservability Server `0.1.0-alpha.1` on [http://localhost:5080](http://localhost:5080)
 - the application-map gRPC endpoint on `localhost:4317`
 
 Open the [cold application map](http://localhost:5080/map?service=TheTinyApplicationLayer) directly, or use the **Application map** link in the sample header.
@@ -129,14 +129,23 @@ Stop the complete demo with:
 docker compose down
 ```
 
-### Local Observability Prerequisites
+### Local ApplicationMap Packages
 
-The Observability packages are not public yet. This temporary showcase expects the repositories to be sibling directories and consumes:
+The ApplicationMap packages are not public yet. This repository temporarily carries the three packages required by the showcase under `packages/application-map`:
 
-- the already packaged ApplicationMap adapters from `../TinyObservability/artifacts/tiny-local-feed`
-- the already published Server files from `../TinyObservability/artifacts/server-publish`
+- `TinyObservability.ApplicationMap`
+- `TinyObservability.ApplicationMap.TinyDispatcher`
+- `TinyObservability.ApplicationMap.TinyValidations`
 
-`TinyDispatcher` and `TinyValidations` still come from NuGet using their real public versions. Docker Compose does not build or package any Tiny library.
+`TinyDispatcher` and `TinyValidations` still come from NuGet.org using their real public versions. The vendored packages will be removed when the ApplicationMap release train is publicly available.
+
+TinyObservability Server is pulled from the public GitHub Container Registry image:
+
+```text
+ghcr.io/george2006/tinyobservability-server:0.1.0-alpha.1
+```
+
+The image is pinned deliberately so the sample does not change underneath users. No TinyObservability checkout, local Server build, or GitHub authentication is required.
 
 ## Why Docker Compose Is Required
 

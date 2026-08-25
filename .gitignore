@@ -27,6 +27,13 @@ coverage.*
 *.nupkg
 *.snupkg
 packages/
+
+# Temporary self-contained ApplicationMap showcase feed.
+!packages/
+packages/*
+!packages/application-map/
+!packages/application-map/README.md
+!packages/application-map/*.nupkg
 project.lock.json
 
 # Docker/local data
