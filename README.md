@@ -159,7 +159,7 @@ The interesting behavior only appears when events are stored durably and process
 - event processing
 - consumer side effects
 
-In development, the sample uses `EnsureCreatedAsync` to create the schema. Production applications should use migrations. The EF Core model includes `Users`, `WelcomeEmailLogs`, and the TinyEvents outbox table through `modelBuilder.UseTinyEventsOutbox()`.
+In development, the sample uses `EnsureCreatedAsync` for its application-owned tables and then calls `MigrateTinyEventsAsync` before the hosted workers start. Production applications should use migrations for their own schema while allowing the TinyEvents migrator to manage its outbox schema. The EF Core model includes `Users`, `WelcomeEmailLogs`, and the TinyEvents outbox table through `modelBuilder.UseTinyEventsOutbox()`.
 
 ## What To Try
 
@@ -194,15 +194,15 @@ Read more in [TinySuite sample notes](docs/tiny-suite.md).
 
 ## Package Versions
 
-Verified against nuget.org on August 24, 2026:
+Verified against nuget.org on August 25, 2026:
 
 - `TinyValidations` `1.1.0-beta.2`
 - `TinyDispatcher` `1.3.0-beta.3`
-- `TinyEvents` `0.1.0-alpha.2`
-- `TinyEvents.SqlServer.EntityFrameworkCore` `0.1.0-alpha.2`
-- `TinyEvents.Worker` `0.1.0-alpha.2`
+- `TinyEvents` `1.0.0-beta.1`
+- `TinyEvents.SqlServer.EntityFrameworkCore` `1.0.0-beta.1`
+- `TinyEvents.Worker` `1.0.0-beta.1`
 
-TinyEvents is still alpha, so APIs may change before 1.0.
+TinyEvents is still a pre-1.0 beta, so APIs may change before the stable release.
 
 ## Tiny Suite Repositories
 
