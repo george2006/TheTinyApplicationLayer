@@ -3,6 +3,7 @@ using TheTinyApplicationLayer.Infrastructure.DependencyInjection;
 using TheTinyApplicationLayer.Infrastructure.Persistence;
 using TheTinyApplicationLayer.Web.Components;
 using TheTinyApplicationLayer.Web.Users;
+using TinyEvents;
 using TinyEvents.Worker;
 using TinyObservability.ApplicationMap;
 using TinyObservability.ApplicationMap.TinyDispatcher;
@@ -34,6 +35,10 @@ builder.Services.AddTinyEventsWorker(options =>
     options.BatchSize = 10;
     options.PollingInterval = TimeSpan.FromSeconds(2);
     options.ClaimTimeout = TimeSpan.FromMinutes(2);
+    options.CleanupEnabled = true;
+    options.ProcessedRetention = TimeSpan.FromHours(1);
+    options.CleanupBatchSize = 1_000;
+    options.CleanupInterval = TimeSpan.FromSeconds(1);
 });
 
 var app = builder.Build();
@@ -55,6 +60,8 @@ if (app.Environment.IsDevelopment())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
 }
+
+await app.Services.MigrateTinyEventsAsync();
 
 app.MapUserEndpoints();
 app.MapStaticAssets();
